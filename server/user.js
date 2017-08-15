@@ -11,7 +11,7 @@ var UserSchema = new Schema({
 		type: String,
 		required:true
 	}
-},{ collection: 'users' }, { versionKey: false });
+},{ collection: 'users', versionKey: false });
  
 UserSchema.pre('save', function (next) {
     var user = this;

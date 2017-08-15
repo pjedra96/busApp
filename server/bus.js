@@ -9,7 +9,7 @@ var BusSchema = new Schema({
 	passengerOut: String,
 	lat: String,
 	lng: String
-},{ collection: 'app_busdata' },{ versionKey: false });
+},{ collection: 'app_busdata', versionKey: false });
  
 /*BusSchema.pre('save', function (next) {
     var data = this;
