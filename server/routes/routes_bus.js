@@ -22,6 +22,7 @@ app.post('/addbus', function(req, res){
         else {
             var newBus = Server.Bus({
                 bus_id: req.body.bus_id,
+				bus_operator: req.body.bus_operator,
 				stopDate: req.body.stopDate,
 				stopTime: req.body.stopTime,
 				passengerIn: req.body.passengerIn,

@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
  
 var BusSchema = new Schema({
 	bus_id: String,
+	bus_operator: String,
 	stopDate: String,
 	stopTime: String,
 	passengerIn: String,
