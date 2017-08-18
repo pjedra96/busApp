@@ -10,7 +10,7 @@ app.get('/',  function(req, res){
 		{
 			res.status(200).send({ "success": true, "msg": "Hello from the node runtime environment" });
 		}else{
-			return res.json({success:false, msg: 'Error while loading the message'})
+			return res.json({success:false, msg: 'Error while loading the message'});
 		}
 });
 app.post('/addbus', function(req, res){

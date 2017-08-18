@@ -25,7 +25,7 @@ var BusSchema = new Schema({
 		data.stopTime = time;
     }
     next();
-});*/
+});/*/
 
 exports.BusSchema = BusSchema;
 //module.exports = mongoose.model('app_busdata', BusSchema);
