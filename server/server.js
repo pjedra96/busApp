@@ -78,6 +78,46 @@ conn3.on('open', function(){
 		});
 });
 
+conn4 = mongoose.createConnection(config.inari);
+BusIdInari = conn4.model('bus_id_list', busId.BusIdSchema);
+
+conn4.on('open', function(){
+	console.log("\nMongo4 set up (Inari connection)");
+		var app4 = express();
+		app4.use(morgan('dev'));
+		app4.use(cors());
+		
+		app4.use(bodyParser.urlencoded({extended: false}));
+		app4.use(bodyParser.json());
+		
+		app4.use(busid_routes);
+		
+		app4.listen(3006, function (err) {
+		   console.log('Server is running at: ' + 'http://localhost:3006')
+		});
+});
+
+conn5 = mongoose.createConnection(config.mahendra);
+BusIdMahendra = conn5.model('bus_id_list', busId.BusIdSchema);
+
+conn5.on('open', function(){
+	console.log("\nMongo5 set up (Mahendra connection)");
+		var app5 = express();
+		app5.use(morgan('dev'));
+		app5.use(cors());
+		
+		app5.use(bodyParser.urlencoded({extended: false}));
+		app5.use(bodyParser.json());
+		
+		app5.use(busid_routes);
+		
+		app5.listen(3007, function (err) {
+		   console.log('Server is running at: ' + 'http://localhost:3007')
+		});
+});
+
 exports.Users = Users;
 exports.Bus = Bus;
 exports.BusId = BusId;
+exports.BusIdInari = BusIdInari;
+exports.BusIdMahendra = BusIdMahendra;

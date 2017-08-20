@@ -6,8 +6,8 @@ var BusSchema = new Schema({
 	bus_operator: String,
 	stopDate: String,
 	stopTime: String,
-	passengerIn: String,
-	passengerOut: String,
+	totalIn: String,
+	totalOut: String,
 	lat: String,
 	lng: String
 },{ collection: 'app_busdata', versionKey: false });

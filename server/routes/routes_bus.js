@@ -25,8 +25,8 @@ app.post('/addbus', function(req, res){
 				bus_operator: req.body.bus_operator,
 				stopDate: req.body.stopDate,
 				stopTime: req.body.stopTime,
-				passengerIn: req.body.passengerIn,
-				passengerOut: req.body.passengerOut,
+				totalIn: req.body.totalIn,
+				totalOut: req.body.totalOut,
 				lat: req.body.lat,
 				lng: req.body.lng
             });
