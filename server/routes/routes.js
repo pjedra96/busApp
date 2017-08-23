@@ -5,7 +5,8 @@ var app = module.exports = express.Router();
  
 var Server = require('../server');
 
-app.get('/', function(req, res){
+module.exports = function(app){
+	app.get('/', function(req, res){
 		if(req)
 		{
 			res.status(200).send({ "success": true, "msg": "Hello from the node runtime environment" });
@@ -13,7 +14,7 @@ app.get('/', function(req, res){
 			return res.json({success:false, msg: 'Error while loading the message'})
 		}
 	});
-app.post('/authenticate', function(req, res) {
+	app.post('/authenticate', function(req, res) {
         Server.Users.findOne({
             username: req.body.username
         }, function(err, user){
@@ -32,7 +33,7 @@ app.post('/authenticate', function(req, res) {
             }
         })
     });
-app.post('/adduser', function(req, res){
+	app.post('/adduser', function(req, res){
         if((!req.body.username) || (!req.body.password)){
             console.log(req.body.username);
             console.log(req.body.password);
@@ -56,7 +57,7 @@ app.post('/adduser', function(req, res){
             })
         }
     });
-app.get('/getInfo', function(req, res){
+	app.get('/getInfo', function(req, res){
         if(req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
             var token = req.headers.authorization.split(' ')[1];
             var decodedtoken = jwt.decode(token, config.secret);
@@ -66,3 +67,4 @@ app.get('/getInfo', function(req, res){
             return res.json({success:false, msg: 'No header'});
         }
     });
+};

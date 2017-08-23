@@ -7,22 +7,11 @@ var mongoose = require('mongoose'),
 	passport = require('passport'),
 	routes = require('./routes/routes'),
 	routes_bus = require('./routes/routes_bus'),
-	busid_routes = require('./routes/bus_id_routes'),
 	bodyParser = require('body-parser'),
 	user = require('./user'),
 	bus = require('./bus'),
 	busId = require('./bus_id'),
-	db,
-	novas;
-	
-// connect to mongo
-db = mongoose.createConnection(config.database),
-Users = db.model('users', user.UserSchema);
-m = new Users;
-m.save();
-
-db.on('open', function(){
-	console.log("\nMongo1 set up");
+	db_list = require('./db_list');
 	
 	var app = express();
 	app.use(morgan('dev'));
@@ -30,94 +19,73 @@ db.on('open', function(){
 
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(bodyParser.json());
+	
+	require('./config/passport')(passport);
+	app.use(passport.initialize());
+	
+	routes(app);
+	routes_bus(app);
+	
+// connect to mongo
+urb_sense = mongoose.createConnection(config.urb_sense),
+Users = urb_sense.model('users', user.UserSchema);
+dbList = urb_sense.model('db_by_client', db_list.DbListSchema);
+m = new Users;
+m.save();
 
-    app.use(routes);
-    app.use(passport.initialize());
-    require('./config/passport')(passport);
-
-    app.listen(3001, function (err) {
-       console.log('Server is running at: ' + 'http://localhost:3001');
-    });
+urb_sense.on('open', function(){
+	console.log("\nMongo1 set up (UrbSense_Monitor)");
 });
 
 novas = mongoose.createConnection(config.novas);
 Bus = novas.model('app_busdata', bus.BusSchema);
+BusId = novas.model('bus_id_list', busId.BusIdSchema);
 
 novas.on('open', function(){
-	console.log("\nMongo2 set up");
-		var app2 = express();
-		app2.use(morgan('dev'));
-		app2.use(cors());
-		
-		app2.use(bodyParser.urlencoded({extended: false}));
-		app2.use(bodyParser.json());
-
-		app2.use(routes_bus);
-		
-		app2.listen(3333, function (err) {
-		   console.log('Server is running at: ' + 'http://localhost:3333')
-		});
+	console.log("\nMongo2 set up (Novas_vn)");
 });
 
-conn3 = mongoose.createConnection(config.novas2);
-BusId = conn3.model('bus_id_list', busId.BusIdSchema);
+inari = mongoose.createConnection(config.inari);
+BusInari = inari.model('app_busdata', bus.BusSchema);
+BusIdInari = inari.model('bus_id_list', busId.BusIdSchema);
 
-conn3.on('open', function(){
-	console.log("\nMongo3 set up");
-		var app3 = express();
-		app3.use(morgan('dev'));
-		app3.use(cors());
-		
-		app3.use(bodyParser.urlencoded({extended: false}));
-		app3.use(bodyParser.json());
-		
-		app3.use(busid_routes);
-		
-		app3.listen(3003, function (err) {
-		   console.log('Server is running at: ' + 'http://localhost:3003')
-		});
+inari.on('open', function(){
+	console.log("\nMongo3 set up (inari_library)");		
 });
 
-conn4 = mongoose.createConnection(config.inari);
-BusIdInari = conn4.model('bus_id_list', busId.BusIdSchema);
+mahendra = mongoose.createConnection(config.mahendra);
+BusMahendra = mahendra.model('app_busdata', bus.BusSchema);
+BusIdMahendra = mahendra.model('bus_id_list', busId.BusIdSchema);
 
-conn4.on('open', function(){
-	console.log("\nMongo4 set up (Inari connection)");
-		var app4 = express();
-		app4.use(morgan('dev'));
-		app4.use(cors());
-		
-		app4.use(bodyParser.urlencoded({extended: false}));
-		app4.use(bodyParser.json());
-		
-		app4.use(busid_routes);
-		
-		app4.listen(3006, function (err) {
-		   console.log('Server is running at: ' + 'http://localhost:3006')
-		});
+mahendra.on('open', function(){
+	console.log("\nMongo4 set up (mahendra)");
 });
 
-conn5 = mongoose.createConnection(config.mahendra);
-BusIdMahendra = conn5.model('bus_id_list', busId.BusIdSchema);
 
-conn5.on('open', function(){
-	console.log("\nMongo5 set up (Mahendra connection)");
-		var app5 = express();
-		app5.use(morgan('dev'));
-		app5.use(cors());
-		
-		app5.use(bodyParser.urlencoded({extended: false}));
-		app5.use(bodyParser.json());
-		
-		app5.use(busid_routes);
-		
-		app5.listen(3007, function (err) {
-		   console.log('Server is running at: ' + 'http://localhost:3007')
-		});
+exports.generateConnection = function(dbname){
+	var urlPrefix = "mongodb://Peter:Biodata01@cluster0-shard-00-00-7kwa9.mongodb.net:27017,cluster0-shard-00-01-7kwa9.mongodb.net:27017,cluster0-shard-00-02-7kwa9.mongodb.net:27017/";
+	var urlSuffix = "?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
+	var url = urlPrefix + dbname + urlSuffix;
+	var conn = mongoose.createConnection(url);
+	
+	newCompany = conn.model('app_busdata', bus.BusSchema);
+	newCompanyIds = conn.model('bus_id_list', busId.BusIdSchema);
+	
+	conn.on('open', function(){
+		console.log("\nMongo set up " + dbname);
+	});
+}
+
+app.listen(3001, function (err) {
+   console.log('Server is running at: ' + 'http://localhost:3001');
 });
+
 
 exports.Users = Users;
+exports.dbList = dbList;
 exports.Bus = Bus;
 exports.BusId = BusId;
+exports.BusInari = BusInari;
 exports.BusIdInari = BusIdInari;
+exports.BusMahendra = BusMahendra;
 exports.BusIdMahendra = BusIdMahendra;
