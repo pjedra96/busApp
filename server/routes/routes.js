@@ -61,7 +61,7 @@ module.exports = function(app){
         if(req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
             var token = req.headers.authorization.split(' ')[1];
             var decodedtoken = jwt.decode(token, config.secret);
-            return res.json({success: true, msg: 'hello '+decodedtoken.username});
+            return res.json({success: true, msg: decodedtoken.username});
         }
         else {
             return res.json({success:false, msg: 'No header'});
