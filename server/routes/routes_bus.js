@@ -1,6 +1,8 @@
 var express = require('express');
 var config = require('../config/config.json');
 
+var	busId = require('../bus_id');
+var bus = require('../bus');
 var app = module.exports = express.Router();
  
 var Server = require('../server');
@@ -26,7 +28,7 @@ module.exports = function(app){
 	app.get('/findBuses/:dbname', function(req,res){
 			var dbname = req.params.dbname;
 			
-			if(dbname == "Novas_vn"){
+			/*if(dbname == "Novas_vn"){
 				model = Server.BusId;
 			}else if(dbname == "inari_library"){
 				model = Server.BusIdInari;
@@ -34,9 +36,11 @@ module.exports = function(app){
 				model = Server.BusIdMahendra;
 			}else{
 				var connection = Server.generateConnection(dbname);
-				model = connection.newCompanyIds;
-			}
-
+				model = connection.model('bus_id_list', busId.BusIdSchema);
+			}*/
+			var connection = Server.generateConnection(dbname);
+			model = connection.model('bus_id_list', busId.BusIdSchema);
+			
 			model.find({}, function (err, buses) {
 					if (err) {
 						return res.json({ "success": false, "msg": "Error while searching for a list of buses", "error": err });
@@ -48,7 +52,7 @@ module.exports = function(app){
 	app.post('/addbus', function(req, res){
 			var dbname = req.body.database;
 			
-			if(dbname == "Novas_vn"){
+			/*if(dbname == "Novas_vn"){
 				model = Server.Bus;
 			}else if(dbname == "inari_library"){
 				model = Server.BusInari;
@@ -56,8 +60,11 @@ module.exports = function(app){
 				model = Server.BusMahendra;
 			}else{
 				var connection = Server.generateConnection(dbname);
-				model = connection.newCompany;
-			}
+				model = connection.model('app_busdata', bus.BusSchema);
+			}*/
+			
+			var connection = Server.generateConnection(dbname);
+			model = connection.model('app_busdata', bus.BusSchema);
 				
 			var newBus = model({
 				bus_id: req.body.bus_id,

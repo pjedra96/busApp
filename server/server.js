@@ -1,9 +1,11 @@
 var mongoose = require('mongoose'),
     express = require('express'),
 	cors = require('cors'),
+	fs = require('fs'),
 	config = require('./config/config.json'),
     morgan  = require('morgan'),
     http = require('http'),
+	https = require('https'),
 	passport = require('passport'),
 	routes = require('./routes/routes'),
 	routes_bus = require('./routes/routes_bus'),
@@ -11,7 +13,11 @@ var mongoose = require('mongoose'),
 	user = require('./user'),
 	bus = require('./bus'),
 	busId = require('./bus_id'),
-	db_list = require('./db_list');
+	db_list = require('./db_list'),
+	privateKey = fs.readFileSync('/etc/ssl/urbansensingltd.com.key', 'utf8'),
+	certificate = fs.readFileSync('/etc/ssl/urbansensingltd.com.chained.crt', 'utf8');
+	
+	var credentials ={key: privateKey, cert: certificate};
 	
 	var app = express();
 	app.use(morgan('dev'));
@@ -37,7 +43,7 @@ urb_sense.on('open', function(){
 	console.log("\nMongo1 set up (UrbSense_Monitor)");
 });
 
-novas = mongoose.createConnection(config.novas);
+/*novas = mongoose.createConnection(config.novas);
 Bus = novas.model('app_busdata', bus.BusSchema);
 BusId = novas.model('bus_id_list', busId.BusIdSchema);
 
@@ -59,22 +65,45 @@ BusIdMahendra = mahendra.model('bus_id_list', busId.BusIdSchema);
 
 mahendra.on('open', function(){
 	console.log("\nMongo4 set up (mahendra)");
-});
+});*/
 
 
+// Function to be called to generate a custom connection
 exports.generateConnection = function(dbname){
 	var urlPrefix = "mongodb://Peter:Biodata01@cluster0-shard-00-00-7kwa9.mongodb.net:27017,cluster0-shard-00-01-7kwa9.mongodb.net:27017,cluster0-shard-00-02-7kwa9.mongodb.net:27017/";
 	var urlSuffix = "?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
 	var url = urlPrefix + dbname + urlSuffix;
-	var conn = mongoose.createConnection(url);
 	
-	newCompany = conn.model('app_busdata', bus.BusSchema);
-	newCompanyIds = conn.model('bus_id_list', busId.BusIdSchema);
-	
-	conn.on('open', function(){
-		console.log("\nMongo set up " + dbname);
-	});
+/*	var model = connection.model('app_busdata', app_busdata.AppBus);
+	var model2 = connection.model('busdata', busData.BusData);*/
+
+	if(connectionArray.length == 0){
+		var conn = mongoose.createConnection(url);
+		conn.on('open', function(){
+			console.log("\nMongo set up :" + dbname);
+		});
+		connectionArray.push(conn);
+		return conn;
+	}else if(connectionArray.length > 0){
+		for (i = 0; i < connectionArray.length; i++) {
+	    	if(connectionArray[i].name == dbname){
+	    		return connectionArray[i];
+	    	}else{
+	    		var conn = mongoose.createConnection(url);
+				conn.on('open', function(){
+					console.log("\nMongo set up :" + dbname);
+				});
+				connectionArray.push(conn);
+	    	}
+	    }
+	}
 }
+
+var httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(8443, function(err){
+	console.log('Server is running at: ' + 'https://localhost:8443');
+});
 
 app.listen(3001, function (err) {
    console.log('Server is running at: ' + 'http://localhost:3001');
@@ -83,9 +112,9 @@ app.listen(3001, function (err) {
 
 exports.Users = Users;
 exports.dbList = dbList;
-exports.Bus = Bus;
+/*exports.Bus = Bus;
 exports.BusId = BusId;
 exports.BusInari = BusInari;
 exports.BusIdInari = BusIdInari;
 exports.BusMahendra = BusMahendra;
-exports.BusIdMahendra = BusIdMahendra;
+exports.BusIdMahendra = BusIdMahendra;*/
